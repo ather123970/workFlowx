@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: workflowx
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    headers:
+      - path: /*
+        name: X-Robots-Tag
+        value: index
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
