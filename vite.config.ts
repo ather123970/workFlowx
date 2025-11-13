@@ -8,6 +8,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: [
+      "workflowx-b4d1.onrender.com",
+      "localhost",
+      "127.0.0.1",
+      ".onrender.com"
+    ],
   },
   build: {
     outDir: "dist",
