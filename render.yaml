@@ -2,12 +2,15 @@ services:
   - type: web
     name: workflowx
     env: static
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     headers:
       - path: /*
-        name: X-Robots-Tag
-        value: index
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
     routes:
       - type: rewrite
         source: /*
