@@ -4,16 +4,15 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
-  base: "/",
+  base: "./",
   server: {
     host: "::",
     port: 8080,
-    allowedHosts: ["workflowx-b4d1.onrender.com"], // ✅ Add this line
   },
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    sourcemap: false,
+    sourcemap: mode === "development",
     rollupOptions: {
       output: {
         manualChunks: undefined,
@@ -31,5 +30,8 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     global: "globalThis",
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
   },
 }));
