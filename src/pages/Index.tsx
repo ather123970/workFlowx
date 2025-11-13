@@ -55,21 +55,36 @@ const Index = () => {
               if (freeJob.status === 'completed' && freeJob.result) {
                 console.log('📚 Generated chapter data:', freeJob.result);
                 console.log('📚 Setting comprehensiveChapter and showing notes viewer');
-                setComprehensiveChapter(freeJob.result);
-                setShowNotesViewer(true);
-                setShowForm(false);
-                setShowHero(false);
-                console.log('📚 State updated - showNotesViewer: true, showForm: false, showHero: false');
                 
-                // Auto-scroll to top
-                setTimeout(() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 100);
-                
-                toast({
-                  title: "✅ FREE Notes Ready!",
-                  description: "Your comprehensive notes have been generated using free AI and data sources!",
-                });
+                // Ensure we have valid chapter data
+                if (freeJob.result && typeof freeJob.result === 'object' && freeJob.result.chapter) {
+                  setComprehensiveChapter(freeJob.result);
+                  
+                  // Use setTimeout to ensure state updates are processed
+                  setTimeout(() => {
+                    setShowNotesViewer(true);
+                    setShowForm(false);
+                    setShowHero(false);
+                    setError(null); // Clear any previous errors
+                    console.log('📚 State updated - showNotesViewer: true, showForm: false, showHero: false');
+                    
+                    // Auto-scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }, 100);
+                  
+                  toast({
+                    title: "✅ FREE Notes Ready!",
+                    description: "Your comprehensive notes have been generated using free AI and data sources!",
+                  });
+                } else {
+                  console.error('❌ Invalid chapter data received:', freeJob.result);
+                  setError("Generated notes data is invalid. Please try again.");
+                  toast({
+                    title: "Generation Issue",
+                    description: "The generated notes data is invalid. Please try again.",
+                    variant: "destructive",
+                  });
+                }
               } else if (freeJob.status === 'failed') {
                 setError(freeJob.error || "Failed to generate notes. Please try again.");
                 
@@ -377,27 +392,55 @@ const Index = () => {
           </div>
         )}
 
-        {/* Debug: Show current state */}
+        {/* Fallback: Show when no component is active */}
         {!showHero && !showForm && !showNotesViewer && !isGenerating && (
-          <div className="min-h-screen flex items-center justify-center bg-yellow-50">
-            <div className="text-center p-8">
-              <h2 className="text-2xl font-bold text-yellow-600 mb-4">Debug: No Component Showing</h2>
-              <p className="text-yellow-500 mb-4">
-                Hero: {showHero ? 'true' : 'false'}, 
-                Form: {showForm ? 'true' : 'false'}, 
-                NotesViewer: {showNotesViewer ? 'true' : 'false'}, 
-                Generating: {isGenerating ? 'true' : 'false'}
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className="text-center p-8 bg-white rounded-xl shadow-lg max-w-md">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">🔄 Something went wrong</h2>
+              <p className="text-gray-600 mb-6">
+                The application encountered an unexpected state. Let's get you back on track!
               </p>
-              <p className="text-yellow-500 mb-4">
-                Chapter exists: {comprehensiveChapter ? 'true' : 'false'}
-              </p>
-              <Button onClick={() => {
-                setShowHero(true);
-                setShowForm(false);
-                setShowNotesViewer(false);
-              }}>
-                Back to Home
-              </Button>
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => {
+                    setShowHero(true);
+                    setShowForm(false);
+                    setShowNotesViewer(false);
+                    setComprehensiveChapter(null);
+                    setError(null);
+                  }}
+                  className="w-full"
+                >
+                  🏠 Back to Home
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowHero(false);
+                    setShowForm(true);
+                    setShowNotesViewer(false);
+                    setComprehensiveChapter(null);
+                    setError(null);
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  📝 Generate New Notes
+                </Button>
+                {comprehensiveChapter && (
+                  <Button 
+                    onClick={() => {
+                      setShowHero(false);
+                      setShowForm(false);
+                      setShowNotesViewer(true);
+                      setError(null);
+                    }}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    📚 View Last Generated Notes
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         )}
